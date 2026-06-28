@@ -2,8 +2,19 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>VetDose - Phần Mềm Tính Liều Thuốc Thú Y Chuyên Nghiệp</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#0d9488">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VetDose">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,8 +39,8 @@
     <header class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-white text-teal-600 p-2.5 rounded-xl shadow-inner flex items-center justify-center">
-                    <i class="fa-solid fa-prescription-bottle-medical text-2xl"></i>
+                <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center">
+                    <img src="/logo.jpg" alt="SunVet" class="w-11 h-11 rounded-lg object-contain">
                 </div>
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
@@ -284,6 +295,11 @@
 
     <!-- Toast -->
     <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-xl text-white text-sm font-semibold shadow-lg"></div>
+
+    <!-- Nút cài app (chỉ hiện khi điện thoại cho phép cài) -->
+    <button id="install-btn" class="hidden fixed bottom-5 right-5 z-[60] px-4 py-3 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-lg flex items-center gap-2">
+        <i class="fa-solid fa-mobile-screen-button"></i> Cài ứng dụng
+    </button>
 
     <script>
     const API = '/api/drugs';
@@ -571,6 +587,25 @@
     el('drug-modal').addEventListener('click', (e) => { if (e.target.id === 'drug-modal') closeForm(); });
 
     loadDrugs();
+
+    // ===== PWA: service worker + nút cài app =====
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    }
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        el('install-btn').classList.remove('hidden');
+    });
+    el('install-btn').addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        el('install-btn').classList.add('hidden');
+    });
+    window.addEventListener('appinstalled', () => el('install-btn').classList.add('hidden'));
     </script>
 </body>
 </html>

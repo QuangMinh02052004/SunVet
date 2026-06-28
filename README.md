@@ -34,6 +34,14 @@ vercel dev        # mở http://localhost:3000
 ```
 > Mở `index.html` trực tiếp bằng `file://` sẽ KHÔNG gọi được API (cần server). Dùng `vercel dev` hoặc deploy.
 
+## Cài như app trên điện thoại (PWA)
+App đã hỗ trợ cài đặt trên Android:
+1. Mở link Vercel bằng **Chrome trên Android**.
+2. Bấm nút **Cài ứng dụng** (góc phải dưới) hoặc menu **⋮ → Cài đặt ứng dụng / Add to Home screen**.
+3. Icon VetDose xuất hiện trên màn hình chính, mở ra chạy toàn màn hình như app thật.
+
+> PWA cần chạy qua HTTPS — tức là phải mở từ link Vercel, không phải `file://`.
+
 ## Lưu ý
 - Dữ liệu liều trong `schema.sql` là **giá trị mẫu để demo** — hãy rà soát lại theo nguồn lâm sàng trước khi dùng thật.
 - API hiện **không có xác thực**: ai có link cũng thêm/sửa/xóa được. Nếu cần, thêm 1 lớp mật khẩu/đăng nhập sau.
