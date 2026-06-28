@@ -386,7 +386,7 @@
         dog.className = sp === 'dog' ? on : off;
         cat.className = sp === 'cat' ? on : off;
         renderDrugList();
-        if (state.selected) selectDrug(state.selected.id);
+        if (state.selected) selectDrug(state.selected.id, false);
     }
 
     // ===== BADGES =====
@@ -441,7 +441,7 @@
     }
 
     // ===== SELECT =====
-    function selectDrug(id) {
+    function selectDrug(id, openSheet = true) {
         const d = DRUGS.find(x => x.id === id);
         if (!d) return;
         state.selected = d;
@@ -471,7 +471,7 @@
 
         recalculate();
         renderDrugList();
-        openCalcSheet();
+        if (openSheet) openCalcSheet();
     }
 
     // ===== Bảng tính dạng popup (chỉ trên điện thoại) =====
@@ -602,7 +602,7 @@
             if (!res.ok) throw new Error((await res.json()).error || 'Lỗi lưu');
             closeForm();
             await loadDrugs();
-            if (state.selected) selectDrug(state.selected.id);
+            if (state.selected) selectDrug(state.selected.id, false);
             toast(id ? 'Đã cập nhật thuốc.' : 'Đã thêm thuốc mới.');
         } catch (err) { toast(err.message, false); }
     });
