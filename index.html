@@ -26,6 +26,27 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Mobile: bảng tính nổi lên dạng bottom sheet khi chọn thuốc */
+        @media (max-width: 1023px) {
+            #calc-backdrop {
+                position: fixed; inset: 0; background: rgba(15, 23, 42, .5);
+                z-index: 49; opacity: 0; pointer-events: none; transition: opacity .28s ease;
+            }
+            #calc-backdrop.open { opacity: 1; pointer-events: auto; }
+            #calculator-panel {
+                position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+                max-height: 90vh; overflow-y: auto;
+                border-radius: 1.25rem 1.25rem 0 0;
+                transform: translateY(105%);
+                transition: transform .3s ease;
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, .2);
+            }
+            #calculator-panel.open { transform: translateY(0); }
+            body.sheet-lock { overflow: hidden; }
+        }
+        @media (min-width: 1024px) { #calc-backdrop { display: none; } }
+
         @media print {
             body * { visibility: hidden; }
             #print-area, #print-area * { visibility: visible; }
@@ -87,19 +108,22 @@
                 </div>
                 <div class="flex gap-1.5 overflow-x-auto mt-3 pb-1" id="category-badges"></div>
             </div>
-            <div class="flex-1 overflow-y-auto max-h-[calc(100vh-280px)] space-y-3 pr-1" id="drug-list-container">
+            <div class="flex-1 lg:overflow-y-auto lg:max-h-[calc(100vh-280px)] space-y-3 pr-1" id="drug-list-container">
                 <p class="text-center text-sm text-slate-400 py-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải dữ liệu...</p>
             </div>
         </section>
 
         <!-- RIGHT -->
-        <section class="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-[80px] self-start max-h-[calc(100vh-110px)] overflow-y-auto pr-1">
+        <section class="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-[80px] self-start lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto pr-1">
             <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden" id="calculator-panel">
                 <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 text-white flex items-center justify-between">
                     <span class="font-bold text-sm tracking-wide uppercase flex items-center gap-2">
                         <i class="fa-solid fa-calculator text-teal-400"></i> Bảng tính liều lượng
                     </span>
-                    <span class="text-xs text-slate-400" id="selected-drug-cat">Chưa chọn thuốc</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-400" id="selected-drug-cat">Chưa chọn thuốc</span>
+                        <button onclick="closeCalcSheet()" class="lg:hidden text-slate-300 hover:text-white text-lg leading-none" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
                 </div>
 
                 <div id="calc-placeholder" class="p-8 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
@@ -293,6 +317,9 @@
         </div>
     </div>
 
+    <!-- Nền mờ cho bảng tính dạng popup (mobile) -->
+    <div id="calc-backdrop" onclick="closeCalcSheet()"></div>
+
     <!-- Toast -->
     <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-xl text-white text-sm font-semibold shadow-lg"></div>
 
@@ -444,7 +471,25 @@
 
         recalculate();
         renderDrugList();
+        openCalcSheet();
     }
+
+    // ===== Bảng tính dạng popup (chỉ trên điện thoại) =====
+    function isMobile() { return window.matchMedia('(max-width: 1023px)').matches; }
+    function openCalcSheet() {
+        if (!isMobile()) return;
+        el('calc-backdrop').classList.add('open');
+        el('calculator-panel').classList.add('open');
+        document.body.classList.add('sheet-lock');
+    }
+    function closeCalcSheet() {
+        el('calc-backdrop').classList.remove('open');
+        el('calculator-panel').classList.remove('open');
+        document.body.classList.remove('sheet-lock');
+    }
+    window.addEventListener('resize', () => {
+        if (!isMobile()) { el('calc-backdrop').classList.remove('open'); document.body.classList.remove('sheet-lock'); }
+    });
 
     function updatePrepUnit() {
         const isTablet = el('prep-type').value === 'tablet';
