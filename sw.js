@@ -1,5 +1,5 @@
 // VetDose service worker — cài app + chạy offline (phần khung).
-const CACHE = 'vetdose-v1';
+const CACHE = 'sunvet-v2';
 const CORE = [
   '/',
   '/index.html',

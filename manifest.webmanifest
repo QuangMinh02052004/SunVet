@@ -1,6 +1,6 @@
 {
-  "name": "VetDose - Tính liều thuốc thú y",
-  "short_name": "VetDose",
+  "name": "SunVet - Tính liều thuốc thú y",
+  "short_name": "SunVet",
   "description": "Tra cứu và tính liều lượng thuốc thú y cho chó, mèo.",
   "start_url": "/",
   "scope": "/",
